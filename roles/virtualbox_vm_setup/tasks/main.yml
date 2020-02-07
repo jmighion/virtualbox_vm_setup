@@ -1,0 +1,194 @@
+---
+# tasks file for personal_setup
+- name: Set authorized key taken from file
+  authorized_key:
+    user: james
+    state: present
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+  tags:
+    - install
+    - config_files
+
+# enp0s8 because it's normally the other device connected from VirtualBox
+- name: Connect network device
+  command: nmcli device con enp0s8
+  changed_when: false
+  tags:
+    - install
+
+- name: Check if VBoxGuestAdditions is installed
+  command: modinfo vboxguest
+  register: vboxguest
+  ignore_errors: yes
+  changed_when: false
+  tags:
+    - install
+    - virtualbox
+
+- name: Install VBoxGuestAdditions
+  block:
+    - name: Mount VBoxGuestAdditions.iso
+      mount:
+        path: /mnt/
+        src: /dev/cdrom
+        state: present
+        fstype: iso9660
+
+    - name: Run VBoxLinuxAdditions.run
+      command: sh /mnt/VBoxLinuxAdditions.run
+
+    - name: Unmount VBoxGuestAdditions.iso
+      mount:
+        path: /mnt/
+        src: /dev/cdrom
+        state: absent
+
+  when: vboxguest.failed
+  tags:
+    - install
+    - virtualbox
+
+# Validate the sudoers file before saving
+# Fully quoted because of the ': ' on the line. See the Gotchas in the YAML docs.
+- name: Passwordless sudo
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%wheel\s'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+  tags:
+    - install
+    - sudoers
+
+- name: Register and subscribe to a specific pool by ID
+  redhat_subscription:
+    state: present
+    username: jmighion@redhat.com
+    password: "{{ rh_pass }}"
+    pool_ids: "{{ pool_ids }}"
+    force_register: yes
+  tags:
+    - install
+    - subscribe
+
+- name: Enable some repositories
+  rhsm_repository:
+    name: "{{ item }}"
+    state: enabled
+  with_items:
+    - rhel-7-server-rpms
+    - rhel-7-server-rh-common-rpms
+    - rhel-7-server-supplementary-rpms
+    - rhel-7-server-extras-rpms
+    - rhel-7-server-devtools-rpms
+    - rhel-7-server-optional-rpms
+    - rhel-server-rhscl-7-rpms
+  tags:
+    - install
+    - subscribe
+
+- name: Install some packages
+  yum:
+    name:
+      - devtoolset-7
+      - vim
+      - wget
+      - bash-completion
+      - epel-release
+      - tree
+      - htop
+      - python2-pip.noarch
+      - python2-devel
+      - xorg-x11-server-Xorg
+      - xorg-x11-xauth
+      - xorg-x11-apps
+      - ncurses-devel
+      - rh-git218
+      # - kmod-devel
+      # - ansible
+    state: latest
+  tags:
+    - install
+    - yum
+
+- name: Update everything
+  yum:
+    name: '*'
+    state: latest
+  when: yum_update | default(false)
+  tags:
+    - update
+    - yum
+
+- name: Update pip
+  pip:
+    name: pip
+    state: latest
+  tags:
+    - update
+    - pip
+
+- name: Make dirs
+  file:
+    state: directory
+    mode: "{{ item.mode }}"
+    path: "{{ item.path }}"
+  with_items:
+    - path: /root/.ssh
+      mode: "0700"
+    - path: /home/james/.ssh
+      mode: "0700"
+  tags:
+    - config_files
+
+- name: example copying file with owner and permissions
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest | default('~/') }}"
+    backup: yes
+  with_items:
+    - src: .bash_profile
+    - src: .bashrc
+    - src: .gitconfig
+    - src: .vimrc
+    - src: .inputrc
+    - src: ssh_config
+      dest: ~/.ssh/config
+    - src: .bash_profile
+      dest: /home/james/
+    - src: .bashrc
+      dest: /home/james/
+    - src: .gitconfig
+      dest: /home/james/
+    - src: .vimrc
+      dest: /home/james/
+    - src: .inputrc
+      dest: /home/james/
+    - src: ssh_config
+      dest: /home/james/.ssh/config
+    - src: enablerh-git2.18.sh
+      dest: /etc/profile.d/
+  tags:
+    - install
+    - config_files
+
+- name: iterm2 shell integration
+  get_url:
+    url: https://iterm2.com/shell_integration/bash
+    dest: "{{ item }}"
+    mode: "0776"
+  with_items:
+    - /root/.iterm2_shell_integration.bash
+    - /home/james/.iterm2_shell_integration.bash
+  tags:
+    - install
+    - config_files
+
+# Little dangerous
+# - name: update pip packages
+#   shell: pip list --outdated | cut -d ' ' -f 1 | xargs -n 1 pip install --upgrade
+#   when: pip_update | default(false)
+#   tags:
+#     - update
+#     - pip

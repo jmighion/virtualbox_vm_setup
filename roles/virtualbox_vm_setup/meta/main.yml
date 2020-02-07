@@ -1,0 +1,15 @@
+galaxy_info:
+  author: James Mighion
+  description: Setup a new vm in virtual box with my personal settings.
+
+  license: GPL-3.0
+
+  min_ansible_version: 2.4
+
+  platforms:
+  - name: RHEL
+    versions:
+    - 7
+
+dependencies:
+  - name: geerlingguy.repo-epel

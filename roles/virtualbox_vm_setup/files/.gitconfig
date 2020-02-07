@@ -1,0 +1,63 @@
+[user]
+        name = James Mighion
+        email = jmighion@redhat.com
+[help]
+        autocorrect = 50
+
+[core]
+        # Might need to change this to $HOME/.gitignore_global
+        excludesfile = ~/.gitignore_global
+        legacyheaders = false # >git 1.5
+        quotepath = false
+
+        # http://stackoverflow.com/questions/136178/git-diff-handling-long-lines
+        pager = less
+        # if ↑ doesn’t work, try: pager = less -+$LESS -FRX
+
+[mergetool]
+        keepBackup = true
+
+[push]
+        default = simple # [ matching | simple ]
+
+[color]
+        ui = auto
+        interactive = auto
+
+[repack]
+        usedeltabaseoffset = true # >git 1.5
+
+[alias]
+        s = status
+        a = !git add . && git status
+        au = !git add -u . && git status
+        aa = !git add . && git add -u . && git status
+        c = commit
+        cm = commit -m
+        #ca = commit --amend # careful
+        ac = !git add . && git status && git commit
+        acm = !git add .&& git status && git commit -m
+        l = log --graph --all --pretty=format:'%C(yellow)%h%C(cyan)%d%Creset %s %C(white)- %an, %ar%Creset'
+        ll = log --stat --abbrev-commit
+        lg = log --color --graph --pretty=format:'%C(bold white)%h%Creset -%C(bold green)%d%Creset %s %C(bold green)(%cr)%Creset %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+        llg = log --color --graph --pretty=format:'%C(bold white)%H %d%Creset%n%s%n%+b%C(bold blue)%an <%ae>%Creset %C(bold green)%cr (%ci)' --abbrev-commit
+	d = diff --ws-error-highlight=all
+        master = checkout master
+        spull = svn rebase
+        spush = svn dcommit
+        alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\\t => \\2/' | sort
+        b = branch -av
+        last = log -1 HEAD
+        fa = fetch --all
+        rh = reset HEAD
+        sl = stash list
+        sp = stash pop
+        sa = stash apply
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path =
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[commit]
+	template = /Users/james/.stCommitMsg

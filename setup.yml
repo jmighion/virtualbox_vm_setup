@@ -1,0 +1,6 @@
+- name: Setup machine with personal files
+  hosts: all
+
+  roles:
+    - role: geerlingguy.repo-epel
+    - role: virtualbox_vm_setup

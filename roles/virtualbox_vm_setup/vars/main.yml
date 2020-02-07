@@ -1,0 +1,4 @@
+---
+# vars file for personal_setup
+rh_pass: "{{ vault_rh_pass }}"
+pool_ids: "{{ vault_pool_ids }}"
