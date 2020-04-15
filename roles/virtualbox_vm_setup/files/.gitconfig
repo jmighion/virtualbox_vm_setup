@@ -1,6 +1,7 @@
 [user]
         name = James Mighion
         email = jmighion@redhat.com
+
 [help]
         autocorrect = 50
 
@@ -41,7 +42,7 @@
         ll = log --stat --abbrev-commit
         lg = log --color --graph --pretty=format:'%C(bold white)%h%Creset -%C(bold green)%d%Creset %s %C(bold green)(%cr)%Creset %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
         llg = log --color --graph --pretty=format:'%C(bold white)%H %d%Creset%n%s%n%+b%C(bold blue)%an <%ae>%Creset %C(bold green)%cr (%ci)' --abbrev-commit
-	d = diff --ws-error-highlight=all
+        d = diff --ws-error-highlight=all
         master = checkout master
         spull = svn rebase
         spush = svn dcommit
@@ -53,11 +54,16 @@
         sl = stash list
         sp = stash pop
         sa = stash apply
+        premo = remote prune origin
+        pla = !git branch -v | grep '\\[gone\\]' | awk '{print $1}' | xargs -r git branch -D
+
 [difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path =
+        cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+        path =
+
 [mergetool "sourcetree"]
-	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
+        cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+        trustExitCode = true
+
 [commit]
-	template = /Users/james/.stCommitMsg
+        template = /Users/james/.stCommitMsg
