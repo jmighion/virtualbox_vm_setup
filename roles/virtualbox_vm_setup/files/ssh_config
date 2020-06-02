@@ -6,3 +6,35 @@ Host *.redhat.com
   GSSAPIAuthentication yes
   GSSAPIDelegateCredentials no
   # https://mojo.redhat.com/docs/DOC-1069454 says never delegate credentials
+
+Host osp-ibm
+  Hostname 169.48.142.226
+  User jmighion
+  IdentityFile ~/.ssh/id_rsa
+  IdentitiesOnly yes
+  PreferredAuthentications publickey
+  Port 10001
+  UpdateHostKeys yes
+
+Host workstation
+  Hostname 172.25.250.9
+  User student
+  StrictHostKeyChecking no
+  IdentityFile ~/.ssh/ravello_id_rsa
+  ProxyCommand ssh bastion -W %h:%p
+  PreferredAuthentications publickey
+
+Host bastion
+  Hostname 172.25.252.1
+  User student
+  StrictHostKeyChecking no
+  ProxyCommand ssh do380-classroom -W %h:%p
+  IdentityFile ~/.ssh/ravello_id_rsa
+  PreferredAuthentications publickey
+
+Host do380-classroom
+  Hostname 150.239.4.23
+  User instructor
+  StrictHostKeyChecking no
+  IdentityFile ~/.ssh/ravello_id_rsa
+  PreferredAuthentications publickey

@@ -5,6 +5,8 @@ if [ -f /etc/bashrc ]; then
 fi
 
 export PS1="[\u@\H \W]\\$ "
+# root PS1
+# export PS1="\[\e[31m\][\u@\H \W]\\$ \[\e[m\]"
 
 PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 export PATH
@@ -60,6 +62,7 @@ alias tree='tree -aCp'
 alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'
+alias build='time flamel.sh --tag asciidoc clean; time flamel.sh --tag asciidoc adoc; time flamel.sh --tag asciidoc '
 
 function rgit () {
     local dir=`pwd`
@@ -83,3 +86,61 @@ function rgit () {
 
 
 # eval $(thefuck --alias)
+
+function check_pr () {
+    echo "Update repo data"
+    git fa
+    echo
+    echo "Current checkout : "
+    git s
+    echo
+    echo "Files that are different from origin/master"
+    git d origin/master --name-only
+    echo
+    echo "How far behind the current branch is from upstream master"
+    git rev-list --count HEAD..origin/master
+}
+
+
+alias spellr="aspell --mode=asciidoc --add-asciidoc-blocks="====" --add-asciidoc-blocks="----" list | sort | uniq -c | so
+rt -rn"
+alias spellrxml="aspell list | sort | uniq -c | sort -rn"
+function spellr_dir {
+  if [ -f /tmp/check-spelling-raw.txt ]
+  then
+    rm -f /tmp/check-spelling-raw.txt
+  fi
+
+  for FILE in $(ls)
+  do
+    echo ${FILE} | sed 's/\(.*\)\.[a-z]\+/\1/' >> /tmp/check-spelling-raw.txt
+  done
+  cat /tmp/check-spelling-raw.txt | sort | uniq > /tmp/check-spelling.txt
+
+  for FILE in $(cat /tmp/check-spelling.txt)
+  do
+    if [ -f ${FILE}.adoc ]
+    then
+      if [ $(cat ${FILE}.adoc | spellr | wc -l) -gt 0 ]
+      then
+        echo ${FILE}.adoc
+        cat ${FILE}.adoc | spellr
+      fi
+    fi
+    if [ -f ${FILE}.xml ]
+    then
+      if [ $(cat ${FILE}.xml | spellrxml | wc -l) -gt 0 ]
+      then
+        echo ${FILE}.xml
+        cat ${FILE}.xml | spellrxml
+      fi
+    fi
+  done
+}
+
+wttr()
+{
+    local request="wttr.in/${1-97213}"
+    [ "$(tput cols)" -lt 125 ]
+    curl -H "Accept-Language: ${LANG%_*}" --compressed "$request"
+}
