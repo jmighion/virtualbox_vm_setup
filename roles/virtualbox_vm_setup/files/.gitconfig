@@ -54,7 +54,7 @@
         sl = stash list
         sp = stash pop
         sa = stash apply
-        premo = remote prune origin
+        premo = !git remote | awk '{print $1}' | xargs -r git remote prune
         pla = !git branch -v | grep '\\[gone\\]' | awk '{print $1}' | xargs -r git branch -D
 
 [difftool "sourcetree"]
@@ -65,5 +65,12 @@
         cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
         trustExitCode = true
 
-[commit]
-        template = /Users/james/.stCommitMsg
+#[commit]
+#        template = /Users/james/.stCommitMsg
+
+[credential]
+        #helper = manager
+[pull]
+        ff = only
+[init]
+        defaultBranch = main
