@@ -95,10 +95,10 @@ function check_pr () {
     git s
     echo
     echo "Files that are different from origin/master"
-    git d origin/master --name-only
+    git d upstream/main --name-only
     echo
     echo "How far behind the current branch is from upstream master"
-    git rev-list --count HEAD..origin/master
+    git rev-list --count HEAD..upstream/main
 }
 
 
